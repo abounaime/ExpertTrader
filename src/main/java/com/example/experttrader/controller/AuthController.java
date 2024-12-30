@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/ig-auth")
@@ -16,12 +17,8 @@ public class AuthController {
         this.igAuthService = igAuthService;
     }
     @PostMapping("/token")
-    public ResponseEntity<String> getToken(){
-        try {
-        String accessToken = igAuthService.authenticate();
+    public ResponseEntity<Mono<String>> getToken(){
+        Mono<String> accessToken = igAuthService.authenticate();
         return ResponseEntity.ok(accessToken);
-        } catch (Exception e) {
-        return ResponseEntity.badRequest().body("Authentication failed: " + e.getMessage());
-        }
     }
 }
