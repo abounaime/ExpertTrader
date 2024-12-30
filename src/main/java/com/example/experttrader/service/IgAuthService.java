@@ -1,5 +1,8 @@
 package com.example.experttrader.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -14,41 +17,35 @@ import java.util.Base64;
 
 @Service
 public class IgAuthService {
-    private final String clientId = "";
-    private final String clientSecret = "";
-    private final String tokenUrl = "";
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    @Value("${ig.api.base-url}")
+    private String baseUrl;
+    @Value("${ig.api.username}")
+    private String username;
+    @Value("${ig.api.password}")
+    private String password;
+    @Value("${ig.api.key}")
+    private String apiKey;
+
 
     private final RestTemplate restTemplate;
-
     public IgAuthService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
     public String authenticate(){
-        //Prepare the credentials for basic auth
-        String authString = clientId + ":" + clientSecret;
-        String encodedAuthString = Base64.getEncoder().encodeToString(authString.getBytes());
+        String authUrl = baseUrl + "/session";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-IG-API-KEY", apiKey);
+        headers.add("Content-Type", "application/json");
 
-        //Create HttpHeaders with Basic Authentication
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Authorization", "Basic " + encodedAuthString);
-        httpHeaders.set("Content-Type", "application/x-www-form-urlencoded");
+        String body = String.format("{\"identifier\":\"%s\", \"password\":\"%s\"}",
+                username, password);
 
-        //Create the request body for token exchange
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "client_credentials");
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
 
-        //Send the request to obtain access token
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, httpHeaders);
-        ResponseEntity<String> response = restTemplate.exchange(tokenUrl,
-                HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(authUrl, request, String.class);
 
-        // Parse the access token from the response
-        String responseBody = response.getBody();
-
-        // You'll want to extract the access token here
-        // Assuming the response is a JSON object containing the token
-        String accessToken = responseBody;
-
-        return accessToken;
+        return response.getHeaders().getFirst("X-SECURITY-TOKEN");
     }
+
 }
