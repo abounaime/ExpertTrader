@@ -17,8 +17,7 @@ public class AuthController {
         this.igAuthService = igAuthService;
     }
     @PostMapping("/token")
-    public ResponseEntity<Mono<String>> getToken(){
-        Mono<String> accessToken = igAuthService.authenticate();
-        return ResponseEntity.ok(accessToken);
+    public Mono<String> getToken(){
+        return igAuthService.authenticate();
     }
 }

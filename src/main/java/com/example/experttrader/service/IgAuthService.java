@@ -32,7 +32,7 @@ public class IgAuthService {
     public Mono<String> authenticate(){
         AuthenticationRequest request = new AuthenticationRequest(username, password);
         return webClient.post()
-                .uri("/session")
+                .uri(baseUrl+"/session")
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .header("X-IG-API-KEY", apiKey)
                 .bodyValue(request)
