@@ -1,13 +1,7 @@
 package com.example.experttrader.dto;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-public class AuthenticationRequest {
-    private final String identifier;
-    private final String password;
-    public AuthenticationRequest(String identifier, String password) {
-        this.identifier = identifier;
-        this.password = password;
-    }
-}
+public record AuthenticationRequest(
+        @NotNull String identifier, @NotNull String password
+) { }
