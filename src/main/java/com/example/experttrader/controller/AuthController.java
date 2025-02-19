@@ -1,6 +1,7 @@
 package com.example.experttrader.controller;
 
 import com.example.experttrader.service.IgAuthService;
+import com.example.experttrader.dto.LoginResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +16,7 @@ public class AuthController {
         this.igAuthService = igAuthService;
     }
     @PostMapping("/token")
-    public Mono<String> getToken(){
+    public Mono<LoginResponse> getToken(){
         return igAuthService.authenticate();
     }
 }

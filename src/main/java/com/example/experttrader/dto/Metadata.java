@@ -1,4 +1,4 @@
-package dto;
+package com.example.experttrader.dto;
 
 import lombok.Data;
 

@@ -3,12 +3,10 @@ pipeline {
 
     environment {
         GIT_REPO = 'https://github.com/abounaime/ExpertTrader.git'
-        GIT_CREDENTIALS = 'jenkins-credentials-id'
     }
 
     options {
         timeout(time: 20, unit: 'MINUTES')
-        timestamps()
     }
 
     stages {
@@ -18,8 +16,8 @@ pipeline {
                     try {
                         checkout([
                             $class: 'GitSCM',
-                            branches: [[name: '*/main']],
-                            userRemoteConfigs: [[url: env.GIT_REPO, credentialsId: env.GIT_CREDENTIALS]]
+                            branches: [[name: '*/master']],
+                            userRemoteConfigs: [[url: env.GIT_REPO]]
                         ])
                     } catch (Exception e) {
                         error("Failed to checkout repository: ${e.message}")
@@ -27,23 +25,23 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
-            steps {
-                sh './gradlew clean build'
-            }
-        }
-        stage('Test') {
+        stage('Test & Static Analysis') {
             parallel {
                 stage('Unit Tests') {
                     steps {
-                        sh './gradlew test'
+                        sh 'docker run --rm -v $PWD:/app -w /app gradle:8-jdk17 gradle test'
                     }
                 }
                 stage('Static Analysis') {
                     steps {
-                        sh './gradlew checkstyleMain checkstyleTest'
+                        sh 'docker run --rm -v $PWD:/app -w /app gradle:8-jdk17 gradle checkstyleMain checkstyleTest'
                     }
                 }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'docker run --rm -v $PWD:/app -w /app gradle:8-jdk17 gradle clean build -x test'
             }
         }
     }

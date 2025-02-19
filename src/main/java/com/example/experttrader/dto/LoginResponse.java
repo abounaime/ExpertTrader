@@ -1,4 +1,4 @@
-package dto;
+package com.example.experttrader.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

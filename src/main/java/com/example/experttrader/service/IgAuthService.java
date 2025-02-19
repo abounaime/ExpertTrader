@@ -2,32 +2,35 @@ package com.example.experttrader.service;
 
 import com.example.experttrader.config.IgApiProperties;
 import com.example.experttrader.dto.AuthenticationRequest;
+import com.example.experttrader.dto.LoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.function.Function;
-
 @Service
 public class IgAuthService {
-    private final static Logger log = LoggerFactory.getLogger(IgAuthService.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final IgApiProperties igApiProperties;
     private final WebClient webClient;
+    private final TokenStorageService tokenStorageService;
     
     public IgAuthService(IgApiProperties igApiProperties,
-                         WebClient.Builder webClientBuilder) {
+                         WebClient.Builder webClientBuilder,
+                         @Lazy TokenStorageService tokenStorageService) {
         this.igApiProperties = igApiProperties;
+        this.tokenStorageService = tokenStorageService;
         this.webClient = webClientBuilder
                 .baseUrl(igApiProperties.getBaseUrl())
                 .build();
     }
 
-    public Mono<String> authenticate(){
+
+    public Mono<LoginResponse> authenticate(){
         var request = createAuthenticationRequest();
 
         return webClient.post()
@@ -41,10 +44,11 @@ public class IgAuthService {
                                 new RuntimeException("Authentication Failed "+
                                         "with status "+clientResponse.statusCode())
                         ))
-                .toEntity(String.class)
-                .map(objectResponseEntity ->
-                        extractSecurityToken(objectResponseEntity.getHeaders()
-                                .getFirst("X-SECURITY-TOKEN")));
+                .toEntity(LoginResponse.class)
+                .doOnNext(response -> this.handleTokens(
+                        response.getHeaders().getFirst("X-SECURITY-TOKEN"),
+                        response.getHeaders().getFirst("CST")) )
+                .map(ResponseEntity::getBody);
     }
 
 
@@ -59,12 +63,15 @@ public class IgAuthService {
                 igApiProperties.getPassword());
     }
 
-    private String extractSecurityToken(String token) {
-        if (token == null || token.isEmpty()){
+    private void handleTokens(String securityToken, String cst) {
+        if (securityToken == null || securityToken.isEmpty()){
             throw new RuntimeException("Missing X-SECURITY-TOKEN in response");
         }
-        log.info("Authentication successful, obtained security token");
-        return token;
+        if (cst == null || cst.isEmpty()){
+            throw new RuntimeException("Missing CST in response");
+        }
+        log.info("Authentication successful, obtained security tokens");
+        tokenStorageService.storeTokens(cst, securityToken);
     }
 }
 

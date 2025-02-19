@@ -8,14 +8,14 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
 @EnableWebFluxSecurity
-public class SecurityConfig {
+    public class SecurityConfig {
 
-    @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http
-                .authorizeExchange(exchanges ->
-                        exchanges.anyExchange().permitAll())
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .build();
-    }
+        @Bean
+        public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+            return http
+                    .authorizeExchange(exchanges ->
+                            exchanges.anyExchange().permitAll())
+                    .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                    .build();
+        }
 }
