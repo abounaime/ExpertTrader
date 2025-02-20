@@ -3,7 +3,9 @@ package com.example.experttrader.config;
 import com.example.experttrader.service.IgAuthService;
 import com.example.experttrader.service.TokenStorageService;
 import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
 public class TokenAuthenticationFilter {
@@ -15,8 +17,10 @@ public class TokenAuthenticationFilter {
         this.igAuthService = igAuthService;
     }
 
-    public ExchangeFilterFunction apply(){
-        return ((request, next) -> )
+    public ExchangeFilterFunction apply() {
+        return (request, next) -> addAuthHeader(request)
+                .flatMap(next::exchange)
+                .flatMap(response -> handleUnauthorized(response, request, next));
     }
 
     private Mono<ClientRequest> addAuthHeader(ClientRequest request){
@@ -29,5 +33,14 @@ public class TokenAuthenticationFilter {
                         .header("CST", tuple.getT2())
                         .build());
 
+    }
+    private Mono<ClientResponse> handleUnauthorized(ClientResponse response, ClientRequest request,
+                                                    ExchangeFunction next){
+        if (response.statusCode().value() == 401){
+            return igAuthService.authenticate()
+                    .then(addAuthHeader(request))
+                    .flatMap(next::exchange);
+        }
+        return Mono.just(response);
     }
 }
