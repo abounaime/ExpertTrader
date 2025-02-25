@@ -1,5 +1,6 @@
 package com.example.experttrader.service;
 
+import com.example.experttrader.config.IgApiProperties;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -10,29 +11,28 @@ import java.time.Duration;
 public class TokenStorageService {
     private final IgAuthService igAuthService;
     private final StringRedisTemplate redisTemplate;
-    private static final String CST_KEY = "IG_CST";
-    private static final String SECURITY_TOKEN_KEY = "IG_SECURITY_TOKEN";
+    private final IgApiProperties igApiProperties;
+    public TokenStorageService(IgAuthService igAuthService, StringRedisTemplate redisTemplate, IgApiProperties igApiProperties) {
 
-    public TokenStorageService(IgAuthService igAuthService, StringRedisTemplate redisTemplate) {
         this.igAuthService = igAuthService;
         this.redisTemplate = redisTemplate;
+        this.igApiProperties = igApiProperties;
     }
 
     public void storeTokens(String cst, String securityToken){
-        redisTemplate.opsForValue().set(CST_KEY, cst, Duration.ofHours(1));
-        redisTemplate.opsForValue().set(SECURITY_TOKEN_KEY, securityToken, Duration.ofHours(1));
+        redisTemplate.opsForValue().set(igApiProperties.getCstLabel(), cst, Duration.ofHours(1));
+        redisTemplate.opsForValue().set(igApiProperties.getSecurityTokenLabel(), securityToken, Duration.ofHours(1));
     }
 
     public String getCstKey(){
-        return redisTemplate.opsForValue().get(CST_KEY);
+        return redisTemplate.opsForValue().get(igApiProperties.getCstLabel());
     }
 
-    public String getSecurityTokenKey(){
-        return redisTemplate.opsForValue().get(SECURITY_TOKEN_KEY);
-    }
+    public String getSecurityTokenKey(){ return redisTemplate.opsForValue().get(igApiProperties.getSecurityTokenLabel());}
 
     public boolean areTokensExpired(){
-        return redisTemplate.opsForValue().get(CST_KEY) == null || redisTemplate.opsForValue().get(SECURITY_TOKEN_KEY) == null;
+        return redisTemplate.opsForValue().get(igApiProperties.getCstLabel()) == null ||
+                redisTemplate.opsForValue().get(igApiProperties.getSecurityTokenLabel()) == null;
     }
 
     public Mono<Void> refreshTokens(){

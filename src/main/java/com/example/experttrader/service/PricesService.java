@@ -33,10 +33,10 @@ public class PricesService {
 
     private void setHeaders(HttpHeaders headers) {
         headers.set(HttpHeaders.CONTENT_TYPE, "application/json");
-        headers.set("X-IG-API-KEY", igApiProperties.getKey());
+        headers.set(igApiProperties.getKeyLabel(), igApiProperties.getKey());
         headers.set("Version", "3");
-        headers.set("X-SECURITY-TOKEN", tokenStorageService.getSecurityTokenKey());
-        headers.set("CST",tokenStorageService.getCstKey());
+        headers.set(igApiProperties.getSecurityTokenLabel(), tokenStorageService.getSecurityTokenKey());
+        headers.set(igApiProperties.getCstLabel(),tokenStorageService.getCstKey());
 
     }
 }

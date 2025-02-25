@@ -12,4 +12,7 @@ public class IgApiProperties {
     private String username;
     private String password;
     private String key;
+    private String keyLabel;
+    private String securityTokenLabel;
+    private String cstLabel;
 }

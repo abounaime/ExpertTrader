@@ -19,8 +19,7 @@ public class IgAuthService {
     private final WebClient webClient;
     private final TokenStorageService tokenStorageService;
     
-    public IgAuthService(IgApiProperties igApiProperties,
-                         WebClient.Builder webClientBuilder,
+    public IgAuthService(IgApiProperties igApiProperties, WebClient.Builder webClientBuilder,
                          @Lazy TokenStorageService tokenStorageService) {
         this.igApiProperties = igApiProperties;
         this.tokenStorageService = tokenStorageService;
@@ -38,29 +37,25 @@ public class IgAuthService {
                 .headers(this::setHeaders)
                 .bodyValue(request)
                 .retrieve()
-                .onStatus(statusCode -> statusCode.is5xxServerError()||
-                        statusCode.is4xxClientError(),
+                .onStatus(statusCode -> statusCode.is5xxServerError()|| statusCode.is4xxClientError(),
                         clientResponse -> Mono.error(
-                                new RuntimeException("Authentication Failed "+
-                                        "with status "+clientResponse.statusCode())
-                        ))
+                                new RuntimeException("Authentication Failed "+ "with status "+clientResponse.statusCode())))
                 .toEntity(LoginResponse.class)
                 .doOnNext(response -> this.handleTokens(
-                        response.getHeaders().getFirst("X-SECURITY-TOKEN"),
-                        response.getHeaders().getFirst("CST")) )
-                .map(ResponseEntity::getBody);
+                        response.getHeaders().getFirst(igApiProperties.getSecurityTokenLabel()),
+                        response.getHeaders().getFirst(igApiProperties.getCstLabel())))
+                .mapNotNull(ResponseEntity::getBody);
     }
 
 
 
     private void setHeaders(HttpHeaders headers) {
         headers.set(HttpHeaders.CONTENT_TYPE, "application/json");
-        headers.set("X-IG-API-KEY", igApiProperties.getKey());
+        headers.set(igApiProperties.getKeyLabel(), igApiProperties.getKey());
     }
 
     private AuthenticationRequest createAuthenticationRequest() {
-        return new AuthenticationRequest(igApiProperties.getUsername(),
-                igApiProperties.getPassword());
+        return new AuthenticationRequest(igApiProperties.getUsername(), igApiProperties.getPassword());
     }
 
     private void handleTokens(String securityToken, String cst) {
