@@ -10,12 +10,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
     @Bean
-    public WebClient webClient(TokenStorageService tokenStorageService, IgAuthService igAuthService,
-                               IgApiProperties igApiProperties){
+    public WebClient webClient(TokenStorageService tokenStorageService,IgApiProperties igApiProperties){
         return WebClient.builder()
                 .baseUrl(igApiProperties.getBaseUrl())
-                .filter(new TokenAuthenticationFilter(tokenStorageService, igAuthService).apply())  // Add token filter
+                .filter(new TokenAuthenticationFilter(tokenStorageService).apply())  // Add token filter
                 .build();
-
     }
 }

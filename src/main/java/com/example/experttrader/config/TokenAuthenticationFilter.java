@@ -10,17 +10,14 @@ import reactor.core.publisher.Mono;
 
 public class TokenAuthenticationFilter {
     private final TokenStorageService tokenStorageService;
-    private final IgAuthService igAuthService;
 
-    public TokenAuthenticationFilter(TokenStorageService tokenStorageService, IgAuthService igAuthService) {
+    public TokenAuthenticationFilter(TokenStorageService tokenStorageService) {
         this.tokenStorageService = tokenStorageService;
-        this.igAuthService = igAuthService;
     }
 
     public ExchangeFilterFunction apply() {
         return (request, next) -> addAuthHeader(request)
-                .flatMap(next::exchange)
-                .flatMap(response -> handleUnauthorized(response, request, next));
+                .flatMap(next::exchange);
     }
 
     private Mono<ClientRequest> addAuthHeader(ClientRequest request){
@@ -32,15 +29,5 @@ public class TokenAuthenticationFilter {
                         .header("X-SECURITY-TOKEN", tuple.getT1())
                         .header("CST", tuple.getT2())
                         .build());
-
-    }
-    private Mono<ClientResponse> handleUnauthorized(ClientResponse response, ClientRequest request,
-                                                    ExchangeFunction next){
-        if (response.statusCode().value() == 401){
-            return igAuthService.authenticate()
-                    .then(addAuthHeader(request))
-                    .flatMap(next::exchange);
-        }
-        return Mono.just(response);
     }
 }
