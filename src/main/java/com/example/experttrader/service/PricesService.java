@@ -11,14 +11,9 @@ public class PricesService {
 
     private final WebClient webClient;
     private final IgApiProperties igApiProperties;
-    private final TokenStorageService tokenStorageService;
-    public PricesService(IgApiProperties igApiProperties,
-                         WebClient.Builder webClientBuilder, TokenStorageService tokenStorageService) {
+    public PricesService(IgApiProperties igApiProperties, WebClient webClient) {
         this.igApiProperties = igApiProperties;
-        this.tokenStorageService = tokenStorageService;
-        this.webClient = webClientBuilder
-                .baseUrl(igApiProperties.getBaseUrl())
-                .build();
+        this.webClient = webClient;
     }
 
 
@@ -35,8 +30,5 @@ public class PricesService {
         headers.set(HttpHeaders.CONTENT_TYPE, "application/json");
         headers.set("X-IG-API-KEY", igApiProperties.getKey());
         headers.set("Version", "3");
-        headers.set("X-SECURITY-TOKEN", tokenStorageService.getSecurityTokenKey());
-        headers.set("CST",tokenStorageService.getCstKey());
-
     }
 }

@@ -20,13 +20,11 @@ public class IgAuthService {
     private final TokenStorageService tokenStorageService;
     
     public IgAuthService(IgApiProperties igApiProperties,
-                         WebClient.Builder webClientBuilder,
+                         @Lazy WebClient webClient,
                          @Lazy TokenStorageService tokenStorageService) {
         this.igApiProperties = igApiProperties;
         this.tokenStorageService = tokenStorageService;
-        this.webClient = webClientBuilder
-                .baseUrl(igApiProperties.getBaseUrl())
-                .build();
+        this.webClient = webClient;
     }
 
 
