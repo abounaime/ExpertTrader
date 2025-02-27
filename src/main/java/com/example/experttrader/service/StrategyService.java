@@ -6,16 +6,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class StrategyService {
 
-    private final AlphaVantageService alphaVantageService;
+    private final EmaService emaService;
 
-    public StrategyService(AlphaVantageService alphaVantageService) {
-        this.alphaVantageService = alphaVantageService;
+    public StrategyService(EmaService emaService) {
+        this.emaService = emaService;
     }
 
     public void evaluateStrategy(String symbol){
-        EMAResponse hourlyEMA100 = alphaVantageService.getEma(symbol,"60min",100);
-        EMAResponse hourlyEMA10 = alphaVantageService.getEma(symbol,"60min",10);
-
+//        EMAResponse hourlyEMA100 = emaService.getEma(symbol,"60min","100");
+//        EMAResponse hourlyEMA10 = emaService.getEma(symbol,"60min","10");
 
     }
 }

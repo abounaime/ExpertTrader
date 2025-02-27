@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class EMAData {
     @JsonProperty("EMA")
-    private String EMA;
+    private String ema;
 }
