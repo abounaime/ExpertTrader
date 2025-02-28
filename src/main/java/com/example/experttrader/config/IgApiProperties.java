@@ -6,10 +6,25 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "ig.api")
-@Data
 public class IgApiProperties {
-    private String baseUrl;
+    private String baseurl;
     private String username;
     private String password;
     private String key;
+
+    public String getBaseurl() {
+        return baseurl;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getKey() {
+        return key;
+    }
 }
