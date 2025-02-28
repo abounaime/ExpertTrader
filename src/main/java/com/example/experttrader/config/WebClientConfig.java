@@ -12,7 +12,7 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient(TokenStorageService tokenStorageService, IgApiProperties igApiProperties){
         return WebClient.builder()
-                .baseUrl(igApiProperties.getBaseUrl())
+                .baseUrl(igApiProperties.getBaseurl())
                 .filter(new TokenAuthenticationFilter(tokenStorageService).filter())  // Add token filter
                 .build();
 
