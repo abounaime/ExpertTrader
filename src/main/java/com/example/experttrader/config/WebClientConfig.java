@@ -14,7 +14,7 @@ public class WebClientConfig {
                                IgApiProperties igApiProperties){
         return WebClient.builder()
                 .baseUrl(igApiProperties.getBaseUrl())
-                .filter(new TokenAuthenticationFilter(tokenStorageService, igAuthService).apply())  // Add token filter
+                .filter(new TokenAuthenticationFilter(tokenStorageService, igAuthService).filter())  // Add token filter
                 .build();
 
     }

@@ -17,7 +17,7 @@ public class TokenAuthenticationFilter {
         this.igAuthService = igAuthService;
     }
 
-    public ExchangeFilterFunction apply() {
+    public ExchangeFilterFunction filter() {
         return (request, next) -> addAuthHeader(request)
                 .flatMap(next::exchange)
                 .flatMap(response -> handleUnauthorized(response, request, next));
