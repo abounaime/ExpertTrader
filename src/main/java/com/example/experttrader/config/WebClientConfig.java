@@ -13,7 +13,7 @@ public class WebClientConfig {
     public WebClient webClient(TokenStorageService tokenStorageService,IgApiProperties igApiProperties){
         return WebClient.builder()
                 .baseUrl(igApiProperties.getBaseUrl())
-                .filter(new TokenAuthenticationFilter(tokenStorageService).apply())  // Add token filter
+                .filter(new TokenAuthenticationFilter(tokenStorageService).filter())  // Add token filter
                 .build();
     }
 }
