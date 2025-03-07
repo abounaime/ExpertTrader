@@ -12,4 +12,20 @@ public class IgApiProperties {
     private String username;
     private String password;
     private String key;
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getKey() {
+        return key;
+    }
 }
