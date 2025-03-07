@@ -15,7 +15,7 @@ public class TokenAuthenticationFilter {
         this.tokenStorageService = tokenStorageService;
     }
 
-    public ExchangeFilterFunction apply() {
+    public ExchangeFilterFunction filter() {
         return (request, next) -> addAuthHeader(request)
                 .flatMap(next::exchange);
     }
