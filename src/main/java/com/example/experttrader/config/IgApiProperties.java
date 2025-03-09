@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "ig.api")
+@Data
 public class IgApiProperties {
     private String baseurl;
     private String username;
