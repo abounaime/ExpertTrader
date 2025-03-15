@@ -2,6 +2,7 @@ package com.example.experttrader.config;
 
 import com.example.experttrader.service.IgAuthService;
 import com.example.experttrader.service.TokenStorageService;
+import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
@@ -16,9 +17,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
     private static final Logger logger = LoggerFactory.getLogger(WebClientConfig.class);
     private final CircuitBreaker circuitBreaker;
+    private final Bulkhead bulkhead;
 
-    public WebClientConfig(CircuitBreakerRegistry circuitBreakerRegistry) {
+    public WebClientConfig(CircuitBreakerRegistry circuitBreakerRegistry, Bulkhead bulkhead) {
         this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("apiClient");
+        this.bulkhead = bulkhead;
     }
 
     @Bean
@@ -36,6 +39,8 @@ public class WebClientConfig {
             return WebClient.builder()
                     .baseUrl(igApiProperties.getBaseurl())
                     .filter(new CircuitBreakerFilter(circuitBreaker))
+                    .filter((request, next) -> Bulkhead.decorateSupplier(bulkhead,
+                            () -> next.exchange(request)).get())
                     .build();
     }
     private static void checkBaseUrl(IgApiProperties igApiProperties) {
