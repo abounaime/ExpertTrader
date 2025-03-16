@@ -1,16 +1,13 @@
 package com.example.experttrader.config;
 
-import com.example.experttrader.service.IgAuthService;
 import com.example.experttrader.service.TokenStorageService;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
-import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
