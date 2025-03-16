@@ -17,11 +17,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
     private static final Logger logger = LoggerFactory.getLogger(WebClientConfig.class);
     private final CircuitBreaker circuitBreaker;
-    private final Bulkhead bulkhead;
+    private final Resilience4jBulkhead resilience4jBulkhead;
 
-    public WebClientConfig(CircuitBreakerRegistry circuitBreakerRegistry, Bulkhead bulkhead) {
+    public WebClientConfig(CircuitBreakerRegistry circuitBreakerRegistry, Resilience4jBulkhead resilience4jBulkhead) {
         this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("apiClient");
-        this.bulkhead = bulkhead;
+        this.resilience4jBulkhead = resilience4jBulkhead;
     }
 
     @Bean
@@ -39,8 +39,10 @@ public class WebClientConfig {
             return WebClient.builder()
                     .baseUrl(igApiProperties.getBaseurl())
                     .filter(new CircuitBreakerFilter(circuitBreaker))
-                    .filter((request, next) -> Bulkhead.decorateSupplier(bulkhead,
-                            () -> next.exchange(request)).get())
+                        .filter((request, next) -> Bulkhead.decorateSupplier(
+                                resilience4jBulkhead.bulkhead(),
+                            () -> next.exchange(request)).get()
+                        )
                     .build();
     }
     private static void checkBaseUrl(IgApiProperties igApiProperties) {
