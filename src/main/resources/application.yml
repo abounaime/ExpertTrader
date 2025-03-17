@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: ExpertTrader
+  datasource:
+    url: ""
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+# IG Markets API
+ig:
+  api:
+    base-url: ${IG_API_BASE_URL:https://api.ig.com/gateway/deal}
+    username: ${IG_API_USERNAME:default_username}
+    password: ${IG_API_PASSWORD:default_password}
+    key: ${IG_API_KEY:default_api_key}
+
+# Resilience4j Circuit Breaker
+resilience4j:
+  circuitbreaker:
+    instances:
+      api-client:
+        registerHealthIndicator: true
+        slidingWindowSize: ${API_CLIENT_SLIDING_WINDOW_SIZE:6}
+        minimumNumberOfCalls: ${API_CLIENT_MIN_CALLS:3}
+        failureRateThreshold: ${API_CLIENT_FAILURE_RATE:50}
+        waitDurationInOpenState: ${API_CLIENT_WAIT_DURATION:5000000000000}
+        permittedNumberOfCallsInHalfOpenState: ${API_CLIENT_HALF_OPEN_CALLS:2}
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+
+  # Resilience4j Bulkhead
+  bulkhead:
+    name: igApiBulkhead
+    maxConcurrentCalls: ${BULKHEAD_MAX_CONCURRENT_CALLS:5}
+    maxWaitDuration: ${BULKHEAD_MAX_WAIT_DURATION:500}
+
+logging:
+  level:
+    org:
+      springframework: DEBUG
+    io:
+      github:
+        resilience4j: DEBUG
+        circuitbreaker: DEBUG
+        bulkhead: DEBUG
+        retry: DEBUG
+        timelimiter: DEBUG
+
+
+
+
+
+
+

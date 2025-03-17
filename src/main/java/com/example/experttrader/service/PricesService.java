@@ -2,6 +2,7 @@ package com.example.experttrader.service;
 
 import com.example.experttrader.config.IgApiProperties;
 import com.example.experttrader.dto.PriceResponse;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -11,7 +12,7 @@ public class PricesService {
 
     private final WebClient webClient;
     private final IgApiProperties igApiProperties;
-    public PricesService(IgApiProperties igApiProperties, WebClient webClient) {
+    public PricesService(IgApiProperties igApiProperties, @Qualifier("webClient") WebClient webClient) {
         this.igApiProperties = igApiProperties;
         this.webClient = webClient;
     }

@@ -5,6 +5,7 @@ import com.example.experttrader.dto.AuthenticationRequest;
 import com.example.experttrader.dto.LoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class IgAuthService {
     private final TokenStorageService tokenStorageService;
     
     public IgAuthService(IgApiProperties igApiProperties,
-                         @Lazy WebClient webClient,
+                         @Lazy @Qualifier("authWebClient") WebClient webClient,
                          @Lazy TokenStorageService tokenStorageService) {
         this.igApiProperties = igApiProperties;
         this.tokenStorageService = tokenStorageService;
