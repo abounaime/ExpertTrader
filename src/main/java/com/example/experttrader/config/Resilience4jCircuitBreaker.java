@@ -15,10 +15,9 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 
 @Configuration
-@ConfigurationProperties(prefix = "resilience4j.circuitbreaker")
+@ConfigurationProperties(prefix = "resilience4j.circuitbreaker.instances.api-client")
 @Data
 public class Resilience4jCircuitBreaker {
-    private String name;
     private Boolean registerHealthIndicator;
     private Integer slidingWindowSize;
     private Integer minimumNumberOfCalls;
@@ -37,6 +36,6 @@ public class Resilience4jCircuitBreaker {
                 .permittedNumberOfCallsInHalfOpenState(permittedNumberOfCallsInHalfOpenState)
                 .automaticTransitionFromOpenToHalfOpenEnabled(automaticTransitionFromOpenToHalfOpenEnabled)
                 .build();
-        return CircuitBreaker.of(name, circuitBreakerConfig);
+        return CircuitBreaker.of("api-client", circuitBreakerConfig);
     }
 }

@@ -21,14 +21,16 @@ ig:
 # Resilience4j Circuit Breaker
 resilience4j:
   circuitbreaker:
-    name: apiClient
-    registerHealthIndicator: true
-    slidingWindowSize: ${API_CLIENT_SLIDING_WINDOW_SIZE:10}
-    minimumNumberOfCalls: ${API_CLIENT_MIN_CALLS:5}
-    failureRateThreshold: ${API_CLIENT_FAILURE_RATE:50}
-    waitDurationInOpenState: ${API_CLIENT_WAIT_DURATION:5000}
-    permittedNumberOfCallsInHalfOpenState: ${API_CLIENT_HALF_OPEN_CALLS:2}
-    automaticTransitionFromOpenToHalfOpenEnabled: true
+    instances:
+      api-client:
+        registerHealthIndicator: true
+        slidingWindowSize: ${API_CLIENT_SLIDING_WINDOW_SIZE:6}
+        minimumNumberOfCalls: ${API_CLIENT_MIN_CALLS:3}
+        failureRateThreshold: ${API_CLIENT_FAILURE_RATE:50}
+        waitDurationInOpenState: ${API_CLIENT_WAIT_DURATION:5000000000000}
+        permittedNumberOfCallsInHalfOpenState: ${API_CLIENT_HALF_OPEN_CALLS:2}
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
 
   # Resilience4j Bulkhead
   bulkhead:
@@ -40,6 +42,14 @@ logging:
   level:
     org:
       springframework: DEBUG
+    io:
+      github:
+        resilience4j: DEBUG
+        circuitbreaker: DEBUG
+        bulkhead: DEBUG
+        retry: DEBUG
+        timelimiter: DEBUG
+
 
 
 
